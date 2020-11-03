@@ -17,9 +17,36 @@ namespace NumeroExtenso
         private static readonly string[] CardinaisFracao = { "", "milésimo", "milionésimo", "bilionésimo", "trilionésimo" };
         private static readonly string[] Moeda = { "real", "reais" };
 
+        public static string ToLongString(this Int64 valor)
+        {
+            return IntToLongString(valor);
+        }
         public static string ToLongString(this Double valor)
         {
             return DoubleToLongString(valor);
+        }
+        public static string ToLongString(this Decimal valor)
+        {
+            return DecimalToLongString(valor, Moeda);
+        }
+
+        public static string IntToLongString(Int64 valor)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (valor == 0)
+            {
+                sb.Append(CardinaisAte19[0]);
+                return sb.ToString();
+            }
+
+            if (valor < 0)
+            {
+                sb.Append("menos ");
+            }
+
+            sb.Append(IntMilhares(Math.Abs(valor)));
+            return sb.ToString();
         }
 
         public static string DoubleToLongString(Double valor)
@@ -28,7 +55,7 @@ namespace NumeroExtenso
 
             Decimal dec = (Decimal)valor - Decimal.Truncate((Decimal)valor);
 
-            if (!(valor > 0 && valor < 1)) // para não ficar: zero e um decimo.
+            if (!(valor > 0 && valor < 1))
             {
                 sb.Append(IntToLongString((Int64)valor));
 
@@ -59,7 +86,7 @@ namespace NumeroExtenso
                             sb.Append(plural ? "s" : "");
                         }
                         if (mod > 0 && div > 0)
-                            sb.Append(" de "); //aparece nos números por extenso
+                            sb.Append(" de "); 
                         if (div > 0)
                         {
                             sb.Append(CardinaisFracao[div]);
@@ -75,14 +102,9 @@ namespace NumeroExtenso
             return sb.ToString();
         }
 
-        public static string ToLongString(this Decimal valor)
-        {
-            return DecimalToLongString(valor, Moeda);
-        }
-
         public static string DecimalToLongString(Decimal valor, string[] Moeda)
         {
-            string[] moedaNome = { "real", "reais" };
+            string[] moedaNome = { Moeda[0], Moeda[1] };
             string[] centavoNome = { "centavo", "centavos" };
 
             Decimal rounded = Decimal.Round(valor, 2);
@@ -91,9 +113,7 @@ namespace NumeroExtenso
 
             double logMil = (int)Math.Log(intero, 1000);
             bool incluiDe = (logMil >= 2 && (int)logMil == logMil);
-           
-            //-------------adicionei essas linhas para elimir o DE em 1.000.001 um milhão e um DE reais
-            
+
             decimal n = Convert.ToString(intero).Length;
 
             if (n >= 6)
@@ -107,14 +127,13 @@ namespace NumeroExtenso
                     incluiDe = false;
                 }
             }
-            //-----------------------------------------------------------------------------------------
 
             StringBuilder sb = new StringBuilder();
             sb.Append(intero.ToLongString());
             sb.Append(" ");
             if (incluiDe)
             {
-                sb.Append("de "); //aparece na moeda por extenso
+                sb.Append("de ");
             }
             sb.Append(moedaNome[intero == 1 ? 0 : 1]);
             if (centavos > 0)
@@ -125,37 +144,6 @@ namespace NumeroExtenso
                 sb.Append(centavoNome[centavos == 1 ? 0 : 1]);
             }
 
-            return sb.ToString();
-        }
-
-        /// <summary>
-        ///    Returns the value as a long string.
-        ///    Retorna o valor por extenso.
-        /// </summary>
-        /// <example>1.513 retorna: mil quinhentos e treze</example>
-        /// <param name="valor"></param>
-        /// <returns></returns>
-        public static string ToLongString(this Int64 valor)
-        {
-            return IntToLongString(valor);
-        }
-
-        public static string IntToLongString(Int64 valor)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (valor == 0)
-            {
-                sb.Append(CardinaisAte19[0]);
-                return sb.ToString();
-            }
-
-            if (valor < 0)
-            {
-                sb.Append("menos ");
-            }
-
-            sb.Append(IntMilhares(Math.Abs(valor)));
             return sb.ToString();
         }
 
@@ -214,7 +202,7 @@ namespace NumeroExtenso
                 bool umMil = centena == 1 && logMil == 1;
 
                 if (!umMil)
-                { // é mil e não um mil
+                {
                     sb.Append(Int3Casas(centena));
                     sb.Append(" ");
                 }
@@ -228,7 +216,7 @@ namespace NumeroExtenso
                     {
                         if (resto % 100 == 0 || resto < 100)
                         {
-                            separador = " e "; // 1.200 = mil e duzentos; 1.201 = mil duzentos e um
+                            separador = " e ";
                         }
                         else
                         {
@@ -246,7 +234,6 @@ namespace NumeroExtenso
                     sb.Append(separador);
                     sb.Append(IntMilhares(resto));
                 }
-
                 return sb.ToString();
             }
 

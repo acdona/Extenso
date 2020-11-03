@@ -19,7 +19,7 @@ namespace ValorPorExtenso
 
                 //   Console.WriteLine(numDouble.ToLongString()); //números com decimais
                 //   Console.WriteLine(numInt.ToLongString()); //números inteiros
-                     Console.WriteLine(numDecimal.ToLongString());  //Extenso de moeda
+                Console.WriteLine(numDecimal.ToLongString());  //Extenso de moeda
 
             }
             while (numDouble != 0);  //zero sai
