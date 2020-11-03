@@ -9,12 +9,13 @@ namespace NumeroExtenso
 {
     public static class Extenso
     {
-        private static readonly string[] CardinaisAte19 = { "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze", "treze", "catorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove" };
+        private static readonly string[] CardinaisAte19 = { "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove" };
         private static readonly string[] Cardinais20ate90 = { "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa" };
         private static readonly string[] Cardinais100ate900 = { "cem", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos" };
         private static readonly string[,] Cardinais1000 = { { "", "" }, { "mil", "mil" }, { "milhão", "milhões" }, { "bilhão", "bilhões" }, { "trilhão", "trilhões" }, { "quadrilhão", "quadrilhões" } };
         private static readonly string[] CardinaisDecimo = { "", "décimo", "centésimo" };
         private static readonly string[] CardinaisFracao = { "", "milésimo", "milionésimo", "bilionésimo", "trilionésimo" };
+        private static readonly string[] Moeda = { "real", "reais" };
 
         public static string ToLongString(this Double valor)
         {
@@ -58,7 +59,7 @@ namespace NumeroExtenso
                             sb.Append(plural ? "s" : "");
                         }
                         if (mod > 0 && div > 0)
-                            sb.Append(" de "); //aparee nos números por extenso
+                            sb.Append(" de "); //aparece nos números por extenso
                         if (div > 0)
                         {
                             sb.Append(CardinaisFracao[div]);
@@ -76,17 +77,12 @@ namespace NumeroExtenso
 
         public static string ToLongString(this Decimal valor)
         {
-            return DecimalToLongString(valor, TiposMoedas.Real);
+            return DecimalToLongString(valor, Moeda);
         }
 
-        public static string ToLongString(this Decimal valor, TiposMoedas moeda)
+        public static string DecimalToLongString(Decimal valor, string[] Moeda)
         {
-            return DecimalToLongString(valor, moeda);
-        }
-
-        public static string DecimalToLongString(Decimal valor, TiposMoedas moeda)
-        {
-            string[] moedaNome = { Moedas.GetNomeSingular(moeda).ToLower(), Moedas.GetNomePlural(moeda).ToLower() };
+            string[] moedaNome = { "real", "reais" };
             string[] centavoNome = { "centavo", "centavos" };
 
             Decimal rounded = Decimal.Round(valor, 2);
@@ -95,12 +91,17 @@ namespace NumeroExtenso
 
             double logMil = (int)Math.Log(intero, 1000);
             bool incluiDe = (logMil >= 2 && (int)logMil == logMil);
+           
             //-------------adicionei essas linhas para elimir o DE em 1.000.001 um milhão e um DE reais
-            decimal n = Convert.ToString(intero).Length - 1;
+            
+            decimal n = Convert.ToString(intero).Length;
+
             if (n >= 6)
             {
-                string str = Convert.ToString(intero).Substring(1, (int)(decimal)n);
+                string str = Convert.ToString(intero);
+                str = str.Substring((int)(n - 6));
                 n = decimal.Parse(str);
+
                 if (n > 0)
                 {
                     incluiDe = false;
